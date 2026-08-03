@@ -68,7 +68,8 @@ class AdminPanelProvider extends PanelProvider
                 return $logo ? asset('storage/' . $logo) : null;
             })
 
-            // ── Custom theme CSS (hasil compile Tailwind v3) ──
+            // ── Custom theme CSS (hasil: npm run build:filament → public/css/filament/admin/theme.css) ──
+            // WAJIB ada di public/; jika 404, seluruh UI admin jadi tanpa style.
             ->theme(asset('css/filament/admin/theme.css'))
 
             // ── Navigation grouping ──

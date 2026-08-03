@@ -1,7 +1,7 @@
 {{-- Interactive map picker for Filament settings (Leaflet + OpenStreetMap) --}}
 @php
-    $lat = (float) ($get('latitude') ?: \App\Support\MapEmbed::DEFAULT_LAT);
-    $lng = (float) ($get('longitude') ?: \App\Support\MapEmbed::DEFAULT_LNG);
+    $lat = (float) ($lat ?? \App\Support\MapEmbed::DEFAULT_LAT);
+    $lng = (float) ($lng ?? \App\Support\MapEmbed::DEFAULT_LNG);
 @endphp
 
 @assets

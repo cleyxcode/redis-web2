@@ -38,7 +38,7 @@
 
 /* ── Table: row hover lebih halus ── */
 .fi-ta-row:hover td {
-    background-color: var(--color-primary-50) / 40%;
+    background-color: rgb(var(--primary-50) / 0.4);
 }
 
 /* ── Scrollbar custom ── */

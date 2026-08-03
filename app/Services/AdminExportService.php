@@ -8,7 +8,6 @@ use App\Models\Pendaftaran;
 use App\Models\Siswa;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer;
@@ -52,17 +51,24 @@ class AdminExportService
     /**
      * @param  Builder<Pendaftaran>|null  $query
      */
-    public function pendaftaranPdf(?Builder $query = null): Response
+    public function pendaftaranPdf(?Builder $query = null): StreamedResponse
     {
         $items = ($query ?? Pendaftaran::query())->latest()->get();
+        $filename = 'pendaftaran-'.now()->format('Ymd-His').'.pdf';
 
-        return Pdf::loadView('exports.pendaftaran-pdf', [
+        $pdf = Pdf::loadView('exports.pendaftaran-pdf', [
             'items' => $items,
             'generatedAt' => now(),
             'school' => 'SD Negeri Warialau',
-        ])
-            ->setPaper('a4', 'landscape')
-            ->download('pendaftaran-'.now()->format('Ymd-His').'.pdf');
+        ])->setPaper('a4', 'landscape');
+
+        // StreamedResponse agar Livewire mengenali sebagai file download
+        // (Illuminate\Http\Response biasa berisi binary → Malformed UTF-8).
+        return response()->streamDownload(
+            static fn () => print ($pdf->output()),
+            $filename,
+            ['Content-Type' => 'application/pdf'],
+        );
     }
 
     /**
@@ -90,17 +96,24 @@ class AdminExportService
     /**
      * @param  Builder<Siswa>|null  $query
      */
-    public function siswaPdf(?Builder $query = null): Response
+    public function siswaPdf(?Builder $query = null): StreamedResponse
     {
         $items = ($query ?? Siswa::query())->orderBy('kelas')->orderBy('nama')->get();
+        $filename = 'siswa-'.now()->format('Ymd-His').'.pdf';
 
-        return Pdf::loadView('exports.siswa-pdf', [
+        $pdf = Pdf::loadView('exports.siswa-pdf', [
             'items' => $items,
             'generatedAt' => now(),
             'school' => 'SD Negeri Warialau',
-        ])
-            ->setPaper('a4', 'portrait')
-            ->download('siswa-'.now()->format('Ymd-His').'.pdf');
+        ])->setPaper('a4', 'portrait');
+
+        // StreamedResponse agar Livewire mengenali sebagai file download
+        // (Illuminate\Http\Response biasa berisi binary → Malformed UTF-8).
+        return response()->streamDownload(
+            static fn () => print ($pdf->output()),
+            $filename,
+            ['Content-Type' => 'application/pdf'],
+        );
     }
 
     /**

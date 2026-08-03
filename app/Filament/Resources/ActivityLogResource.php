@@ -26,6 +26,23 @@ class ActivityLogResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Audit Log';
 
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::getModel()::query()->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'gray';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Total catatan audit';
+    }
+
     public static function canCreate(): bool
     {
         return false;

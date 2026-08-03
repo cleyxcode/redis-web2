@@ -60,8 +60,16 @@ class AdminExportTest extends TestCase
             'application/pdf',
             (string) $response->headers->get('Content-Type')
         );
-        $this->assertStringContainsString('%PDF', $response->getContent());
-        $this->assertStringContainsString('pendaftaran-', (string) $response->headers->get('Content-Disposition'));
+        $this->assertStringContainsString(
+            'pendaftaran-',
+            (string) $response->headers->get('Content-Disposition')
+        );
+
+        ob_start();
+        $response->sendContent();
+        $content = (string) ob_get_clean();
+
+        $this->assertStringContainsString('%PDF', $content);
     }
 
     public function test_export_siswa_excel_and_pdf(): void
@@ -83,7 +91,12 @@ class AdminExportTest extends TestCase
 
         $pdf = app(AdminExportService::class)->siswaPdf();
         $this->assertSame(200, $pdf->getStatusCode());
-        $this->assertStringContainsString('%PDF', $pdf->getContent());
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $pdf);
+
+        ob_start();
+        $pdf->sendContent();
+        $pdfContent = (string) ob_get_clean();
+        $this->assertStringContainsString('%PDF', $pdfContent);
     }
 
     public function test_export_pendaftaran_excel_respects_query_filter(): void

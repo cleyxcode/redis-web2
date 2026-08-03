@@ -77,10 +77,18 @@ class PublicApiTest extends TestCase
             ->assertJsonPath('message', 'Pendaftaran sedang tidak dibuka.');
 
         $admin = $this->createAdmin();
-        $this->createInfoPendaftaran($admin, ['tahun_ajaran' => '2026/2027']);
+        $this->createInfoPendaftaran($admin, [
+            'tahun_ajaran' => '2026/2027',
+            'syarat' => "1. Berusia minimal 6 tahun\n2. Fotokopi Akta Kelahiran\n3. Fotokopi Kartu Keluarga",
+        ]);
 
         $this->getJson('/api/v1/info-pendaftaran')
             ->assertOk()
-            ->assertJsonPath('tahun_ajaran', '2026/2027');
+            ->assertJsonPath('tahun_ajaran', '2026/2027')
+            ->assertJsonPath('syarat', "1. Berusia minimal 6 tahun\n2. Fotokopi Akta Kelahiran\n3. Fotokopi Kartu Keluarga")
+            ->assertJsonPath('syarat_list.0', 'Berusia minimal 6 tahun')
+            ->assertJsonPath('syarat_list.1', 'Fotokopi Akta Kelahiran')
+            ->assertJsonPath('syarat_list.2', 'Fotokopi Kartu Keluarga')
+            ->assertJsonCount(3, 'syarat_list');
     }
 }

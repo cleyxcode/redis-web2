@@ -126,6 +126,12 @@ class EditAllSettings extends ResourcePage implements HasForms
                                         ViewField::make('location_picker')
                                             ->label('')
                                             ->view('filament.forms.components.location-map-picker')
+                                            ->viewData(function ($get): array {
+                                                return [
+                                                    'lat' => (float) ($get('latitude') ?: MapEmbed::DEFAULT_LAT),
+                                                    'lng' => (float) ($get('longitude') ?: MapEmbed::DEFAULT_LNG),
+                                                ];
+                                            })
                                             ->dehydrated(false)
                                             ->columnSpanFull(),
                                         Grid::make(2)->schema([

@@ -32,19 +32,25 @@ class PendaftaranResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Pendaftaran::query()->where('status', 'pending')->count();
+        $count = Pendaftaran::query()->count();
 
         return $count > 0 ? (string) $count : null;
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'warning';
+        return Pendaftaran::query()->where('status', 'pending')->exists()
+            ? 'warning'
+            : 'primary';
     }
 
     public static function getNavigationBadgeTooltip(): ?string
     {
-        return 'Pendaftaran menunggu verifikasi';
+        $pending = Pendaftaran::query()->where('status', 'pending')->count();
+
+        return $pending > 0
+            ? "Total pendaftaran · {$pending} menunggu verifikasi"
+            : 'Total data pendaftaran';
     }
 
     public static function canCreate(): bool

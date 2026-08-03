@@ -21,7 +21,9 @@ class PendaftaranController extends Controller
             return response()->json(['message' => 'Pendaftaran sedang tidak dibuka.'], 404);
         }
 
-        return response()->json($info);
+        return response()->json(array_merge($info->toArray(), [
+            'syarat_list' => $info->syarat_list,
+        ]));
     }
 
     public function store(Request $request): JsonResponse

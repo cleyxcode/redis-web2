@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\Berita;
+use App\Models\InfoPendaftaran;
 use App\Models\Pendaftaran;
 use App\Observers\BeritaObserver;
+use App\Observers\InfoPendaftaranObserver;
 use App\Observers\PendaftaranObserver;
 use App\View\Composers\LayoutComposer;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -25,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Berita::observe(BeritaObserver::class);
+        InfoPendaftaran::observe(InfoPendaftaranObserver::class);
         Pendaftaran::observe(PendaftaranObserver::class);
 
         View::composer(['layouts.app', 'layouts.auth', 'pages.profil'], LayoutComposer::class);

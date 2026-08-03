@@ -23,6 +23,23 @@ class GaleriResource extends Resource
     protected static ?string $navigationGroup = 'Konten Website';
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::getModel()::query()->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'primary';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Total foto galeri';
+    }
+
     public static function form(Form $form): Form
     {
         return $form
