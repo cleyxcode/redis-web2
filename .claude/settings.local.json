@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan migrate:fresh)",
+      "Bash(php artisan make:filament-resource ProfilSekolah --generate)",
+      "Bash(php artisan make:filament-resource Guru --generate)",
+      "Bash(php artisan make:filament-resource Siswa --generate)",
+      "Bash(php artisan make:filament-resource Berita --generate)",
+      "Bash(php artisan make:filament-resource Galeri --generate)",
+      "Bash(php artisan make:filament-resource InfoPendaftaran --generate)",
+      "Bash(php artisan make:filament-resource Pendaftaran --generate)",
+      "Bash(php artisan make:filament-resource Banner --generate)",
+      "Bash(php artisan make:filament-resource Setting --generate)",
+      "Bash(php artisan make:seeder UserSeeder)",
+      "Bash(php artisan make:seeder ProfilSekolahSeeder)",
+      "Bash(php artisan make:seeder SettingsSeeder)",
+      "Bash(php artisan config:clear)",
+      "Bash(php artisan cache:clear)",
+      "Bash(php artisan route:list --name=home)",
+      "Bash(php artisan view:clear)",
+      "Bash(php artisan tinker --execute=\"echo App\\\\Models\\\\ProfilSekolah::first\\(\\)->nama_sekolah;\")",
+      "Bash(php -m)",
+      "Bash(php8.2 -m)",
+      "Bash(php artisan route:list --path=/)",
+      "Bash(php artisan migrate)",
+      "Bash(php --ini)",
+      "Bash(php -r \"echo PHP_VERSION;\")",
+      "Bash(php artisan route:list --path=api/v1)",
+      "Bash(find /home/code/project-laravel/web-warialau/resources -type f \\\\\\(-name *.css -o -name *.js \\\\\\))",
+      "Bash(php -r \"echo extension_loaded\\(''''pdo_sqlite''''\\) ? ''''pdo_sqlite: OK'''' : ''''pdo_sqlite: TIDAK ADA'''';\")",
+      "Bash(redis-cli KEYS \"*\")",
+      "Bash(redis-cli DBSIZE)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost/api/v1/profil-sekolah -H \"Accept: application/json\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:80/api/v1/guru -H \"Accept: application/json\")",
+      "Bash(redis-cli PING)",
+      "Bash(redis-cli INFO server)"
+    ]
+  }
+}
