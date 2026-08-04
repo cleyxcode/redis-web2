@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Banner;
 use App\Models\Berita;
+use App\Models\Faq;
 use App\Models\Galeri;
 use App\Models\Guru;
 use App\Models\InfoPendaftaran;
@@ -46,6 +47,8 @@ class HomeController extends Controller
 
         $banners = Banner::where('status', 'aktif')->orderBy('urutan')->get();
 
+        $faqs = Faq::query()->aktif()->ordered()->get();
+
         return view('pages.home', compact(
             'profil',
             'settings',
@@ -55,6 +58,7 @@ class HomeController extends Controller
             'galeri',
             'pendaftaranAktif',
             'banners',
+            'faqs',
         ));
     }
 }

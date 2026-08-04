@@ -16,6 +16,7 @@ class ProfilSekolah extends Model
         'jumlah_ruang_kelas',
         'visi',
         'misi',
+        'tujuan',
         'sejarah',
         'alamat',
         'kontak',

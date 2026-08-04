@@ -205,6 +205,21 @@
     </section>
     @endif
 
+    {{-- ── Tujuan ── --}}
+    @if($profil && $profil->tujuan)
+    <section class="reveal">
+        <div class="bg-gradient-to-br from-secondary/10 via-cream to-accent/10 dark:from-secondary/20 dark:via-slate-900 dark:to-accent/10 rounded-3xl border border-sand dark:border-slate-800 p-8 md:p-10">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-11 h-11 bg-accent/20 rounded-xl flex items-center justify-center border border-accent/30">
+                    <span class="material-symbols-outlined text-accent text-xl" style="font-variation-settings:'FILL' 1">flag</span>
+                </div>
+                <h3 class="font-display text-2xl font-black text-slate-900 dark:text-white">Tujuan Sekolah</h3>
+            </div>
+            <p class="text-slate-700 dark:text-slate-300 text-[15px] leading-relaxed">{{ $profil->tujuan }}</p>
+        </div>
+    </section>
+    @endif
+
     {{-- ── Sejarah ── --}}
     @if($profil && $profil->sejarah)
     <section class="reveal">
@@ -225,6 +240,38 @@
                         <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4 last:mb-0 text-[15px]">{{ $paragraf }}</p>
                     @endforeach
                 </div>
+            </div>
+        </div>
+    </section>
+    @endif
+
+    {{-- ── Tonggak Sejarah ── --}}
+    @if(isset($tonggakSejarah) && $tonggakSejarah->isNotEmpty())
+    <section class="reveal">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+            <span class="section-eyebrow mb-3 inline-flex">
+                <span class="material-symbols-outlined text-sm">timeline</span>
+                Tonggak
+            </span>
+            <h2 class="font-display text-4xl font-black text-slate-900 dark:text-white">
+                Tonggak <span class="text-gradient">Sejarah</span>
+            </h2>
+        </div>
+        <div class="relative pl-2">
+            <div class="absolute left-[27px] top-3 bottom-3 w-0.5 bg-sand dark:bg-slate-700"></div>
+            <div class="space-y-6">
+                @foreach($tonggakSejarah as $item)
+                <div class="relative flex gap-5 items-start">
+                    <div class="relative z-10 w-14 shrink-0">
+                        <div class="w-14 py-1.5 rounded-lg bg-primary/10 text-primary text-center text-xs font-black font-display">
+                            {{ $item->tahun }}
+                        </div>
+                    </div>
+                    <div class="flex-1 bg-white dark:bg-slate-900 rounded-2xl border border-sand dark:border-slate-800 p-5 shadow-sm">
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{{ $item->deskripsi }}</p>
+                    </div>
+                </div>
+                @endforeach
             </div>
         </div>
     </section>
@@ -287,15 +334,17 @@
                     </div>
                 </div>
                 @endif
+                @if(!empty($settings['jam_operasional']))
                 <div class="info-card bg-white dark:bg-slate-900 p-6 rounded-2xl border border-sand dark:border-slate-800 flex items-start gap-4 shadow-sm">
                     <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center shrink-0">
                         <span class="material-symbols-outlined text-accent" style="font-variation-settings:'FILL' 1">schedule</span>
                     </div>
                     <div>
                         <h4 class="font-display font-black text-slate-900 dark:text-white text-sm mb-1">Jam Operasional</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Senin – Sabtu<br/>07.30 – 14.00 WIT</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 whitespace-pre-line">{{ $settings['jam_operasional'] }}</p>
                     </div>
                 </div>
+                @endif
             </div>
 
             {{-- Map --}}

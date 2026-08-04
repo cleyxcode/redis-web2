@@ -98,6 +98,11 @@ class EditAllSettings extends ResourcePage implements HasForms
                                             ->label('Email Sekolah')
                                             ->email()
                                             ->prefixIcon('heroicon-o-envelope'),
+                                        Textarea::make('jam_operasional')
+                                            ->label('Jam Operasional')
+                                            ->rows(2)
+                                            ->helperText('Ditampilkan di halaman profil website & aplikasi. Satu baris per baris teks.')
+                                            ->columnSpanFull(),
                                     ])
                                     ->columns(2),
                             ]),

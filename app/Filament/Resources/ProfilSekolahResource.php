@@ -40,7 +40,13 @@ class ProfilSekolahResource extends Resource
                 Forms\Components\Section::make('Visi Misi')
                     ->schema([
                         Forms\Components\Textarea::make('visi')->rows(3),
-                        Forms\Components\Textarea::make('misi')->rows(3),
+                        Forms\Components\Textarea::make('misi')
+                            ->rows(5)
+                            ->helperText('Satu poin per baris. Nomor otomatis boleh ditulis atau tidak.'),
+                        Forms\Components\Textarea::make('tujuan')
+                            ->rows(3)
+                            ->columnSpanFull()
+                            ->helperText('Tujuan sekolah yang ditampilkan di aplikasi & website.'),
                         Forms\Components\Textarea::make('sejarah')->rows(5)->columnSpanFull(),
                     ])->columns(2),
 

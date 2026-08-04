@@ -16,6 +16,7 @@ class SettingsSeeder extends Seeder
             ['key' => 'alamat_sekolah', 'value' => null, 'type' => 'text'],
             ['key' => 'no_telp',        'value' => null, 'type' => 'text'],
             ['key' => 'email_sekolah',  'value' => null, 'type' => 'text'],
+            ['key' => 'jam_operasional', 'value' => "Senin – Sabtu\n07.30 – 14.00 WIT", 'type' => 'text'],
             ['key' => 'facebook_url',   'value' => null, 'type' => 'url'],
             ['key' => 'instagram_url',  'value' => null, 'type' => 'url'],
             ['key' => 'maps_embed',     'value' => null, 'type' => 'text'],

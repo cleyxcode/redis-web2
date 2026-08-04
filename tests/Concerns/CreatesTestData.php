@@ -6,6 +6,7 @@ namespace Tests\Concerns;
 
 use App\Models\Banner;
 use App\Models\Berita;
+use App\Models\Faq;
 use App\Models\Galeri;
 use App\Models\Guru;
 use App\Models\InfoPendaftaran;
@@ -13,6 +14,7 @@ use App\Models\Notifikasi;
 use App\Models\Pendaftaran;
 use App\Models\ProfilSekolah;
 use App\Models\Siswa;
+use App\Models\TonggakSejarah;
 use App\Models\User;
 
 trait CreatesTestData
@@ -37,9 +39,30 @@ trait CreatesTestData
             'jumlah_ruang_kelas' => 6,
             'visi' => 'Visi sekolah',
             'misi' => 'Misi sekolah',
+            'tujuan' => 'Tujuan sekolah',
             'sejarah' => 'Sejarah sekolah',
             'alamat' => 'Warialau, Maluku',
             'kontak' => '081234567890',
+        ], $overrides));
+    }
+
+    protected function createFaq(array $overrides = []): Faq
+    {
+        return Faq::create(array_merge([
+            'pertanyaan' => 'Pertanyaan FAQ test?',
+            'jawaban' => 'Jawaban FAQ test.',
+            'urutan' => 1,
+            'status' => 'aktif',
+        ], $overrides));
+    }
+
+    protected function createTonggakSejarah(array $overrides = []): TonggakSejarah
+    {
+        return TonggakSejarah::create(array_merge([
+            'tahun' => '1985',
+            'deskripsi' => 'Pendirian sekolah.',
+            'urutan' => 1,
+            'status' => 'aktif',
         ], $overrides));
     }
 

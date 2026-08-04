@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,           // Admin user (user_id = 1)
             ProfilSekolahSeeder::class,  // Data profil sekolah
             SettingsSeeder::class,       // Pengaturan web
+            FaqSeeder::class,            // FAQ website & mobile
+            TonggakSejarahSeeder::class, // Tonggak sejarah sekolah
             GuruSeeder::class,           // 40 data guru
             SiswaSeeder::class,          // 40 data siswa
             BeritaSeeder::class,         // 40 data berita

@@ -334,8 +334,10 @@
                 <p class="text-slate-500 dark:text-slate-400 leading-relaxed mb-7 text-[15px]">
                     @if($profil?->sejarah)
                         {{ \Illuminate\Support\Str::limit($profil->sejarah, 280) }}
+                    @elseif($profil?->visi)
+                        {{ \Illuminate\Support\Str::limit($profil->visi, 280) }}
                     @else
-                        SD Negeri Warialau berdiri sejak tahun {{ $profil->tahun_berdiri ?? '1980' }} dan telah menjadi pusat pendidikan berkualitas di Kepulauan Aru. Dengan tenaga pendidik berpengalaman, kami berkomitmen mencetak generasi penerus bangsa yang siap menghadapi masa depan.
+                        Informasi profil sekolah belum dilengkapi. Silakan atur melalui panel admin.
                     @endif
                 </p>
                 <div class="space-y-3 mb-8">
@@ -583,31 +585,22 @@
 
             {{-- Right: Accordions --}}
             <div class="lg:col-span-3 space-y-3 reveal-right">
-                @php $faqs = [
-                    ['q'=>'Kapan pendaftaran siswa baru dibuka?',
-                     'a'=>'Pendaftaran siswa baru dibuka setiap tahun sekitar bulan Februari–April. Pantau pengumuman resmi di website ini atau kunjungi kantor sekolah untuk informasi terkini.'],
-                    ['q'=>'Apa saja dokumen pendaftaran yang diperlukan?',
-                     'a'=>'Dokumen yang diperlukan: (1) Fotokopi Akta Kelahiran, (2) Fotokopi Kartu Keluarga, (3) Pas foto 3×4 sebanyak 3 lembar, dan (4) Formulir pendaftaran yang diisi lengkap.'],
-                    ['q'=>'Berapa kuota penerimaan siswa baru?',
-                     'a'=>'Kami menerima sekitar 120 siswa baru per tahun yang dibagi dalam beberapa rombongan belajar. Penerimaan dilakukan secara transparan berdasarkan usia dan ketersediaan tempat.'],
-                    ['q'=>'Apakah ada biaya pendaftaran?',
-                     'a'=>'Tidak ada biaya pendaftaran. Seluruh proses penerimaan siswa baru di SD Negeri Warialau dilaksanakan secara gratis sebagai sekolah negeri.'],
-                    ['q'=>'Apa saja ekstrakurikuler yang tersedia?',
-                     'a'=>'Kami menyediakan: Pramuka, Olahraga (bulu tangkis, futsal), Kesenian (tari, paduan suara), Literasi, Sains Club, Dokter Kecil, dan TIK.'],
-                ]; @endphp
-
-                @foreach($faqs as $i => $faq)
+                @forelse($faqs as $i => $faq)
                 <div class="faq-item bg-cream dark:bg-slate-900 border border-sand dark:border-slate-800 rounded-2xl overflow-hidden hover:border-secondary/40 transition-colors shadow-sm">
                     <button onclick="toggleFaq({{ $i }})"
                             class="w-full flex items-center justify-between px-6 py-4.5 text-left font-bold text-slate-800 dark:text-slate-200 hover:text-primary dark:hover:text-accent transition-colors text-[13.5px] gap-4 py-4">
-                        <span>{{ $faq['q'] }}</span>
+                        <span>{{ $faq->pertanyaan }}</span>
                         <span class="faq-chevron material-symbols-outlined text-slate-300 dark:text-slate-600 text-xl shrink-0 transition-transform duration-300 bg-white dark:bg-slate-800 rounded-full w-7 h-7 flex items-center justify-center">add</span>
                     </button>
                     <div id="faq-{{ $i }}" class="faq-body px-6">
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed pb-5">{{ $faq['a'] }}</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed pb-5">{{ $faq->jawaban }}</p>
                     </div>
                 </div>
-                @endforeach
+                @empty
+                <div class="bg-cream dark:bg-slate-900 border border-sand dark:border-slate-800 rounded-2xl p-8 text-center">
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Belum ada FAQ. Silakan tambahkan melalui panel admin.</p>
+                </div>
+                @endforelse
             </div>
         </div>
     </div>

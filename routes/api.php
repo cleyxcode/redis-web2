@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\DeviceTokenController;
+use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\GaleriController;
 use App\Http\Controllers\Api\GuruController;
 use App\Http\Controllers\Api\HealthController;
@@ -27,6 +28,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     // ── Public ──────────────────────────────────────────────────────
     Route::get('profil-sekolah', [ProfilSekolahController::class, 'profil']);
     Route::get('banner', [ProfilSekolahController::class, 'banner']);
+    Route::get('faq', [FaqController::class, 'index']);
     Route::get('guru', [GuruController::class, 'index']);
     Route::get('berita', [BeritaController::class, 'index']);
     Route::get('berita/{id}', [BeritaController::class, 'show']);
