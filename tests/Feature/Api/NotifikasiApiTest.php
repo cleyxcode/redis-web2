@@ -17,6 +17,7 @@ class NotifikasiApiTest extends TestCase
     public function test_notifikasi_requires_auth(): void
     {
         $this->getJson('/api/v1/notifikasi')->assertUnauthorized();
+        $this->getJson('/api/v1/notifikasi/unread-count')->assertUnauthorized();
     }
 
     public function test_list_unread_count_and_mark_read(): void
@@ -28,12 +29,15 @@ class NotifikasiApiTest extends TestCase
 
         $list = $this->getJson('/api/v1/notifikasi')->assertOk();
         $this->assertSame(2, $list->json('total'));
+        $this->assertIsBool($list->json('data.0.dibaca'));
+        $this->assertIsInt($list->json('data.0.id'));
+        $this->assertIsInt($list->json('data.0.user_id'));
 
         $this->getJson('/api/v1/notifikasi/unread-count')
             ->assertOk()
             ->assertJsonPath('unread', 2);
 
-        $this->patchJson('/api/v1/notifikasi/' . $n1->id . '/baca')
+        $this->patchJson('/api/v1/notifikasi/'.$n1->id.'/baca')
             ->assertOk()
             ->assertJsonPath('message', 'Notifikasi ditandai sudah dibaca.');
 
@@ -46,5 +50,27 @@ class NotifikasiApiTest extends TestCase
 
         $this->getJson('/api/v1/notifikasi/unread-count')
             ->assertJsonPath('unread', 0);
+    }
+
+    public function test_mark_missing_notifikasi_returns_404_json(): void
+    {
+        $user = $this->createUser();
+        Sanctum::actingAs($user);
+
+        $this->patchJson('/api/v1/notifikasi/999999/baca')
+            ->assertNotFound()
+            ->assertJsonPath('message', 'Notifikasi tidak ditemukan.');
+    }
+
+    public function test_trailing_slash_list_still_works(): void
+    {
+        $user = $this->createUser();
+        $this->createNotifikasi($user, ['judul' => 'Trailing']);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/notifikasi/')
+            ->assertOk()
+            ->assertJsonPath('total', 1)
+            ->assertJsonPath('data.0.judul', 'Trailing');
     }
 }

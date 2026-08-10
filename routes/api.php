@@ -68,6 +68,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::get('notifikasi/unread-count', [NotifikasiController::class, 'unreadCount']);
         Route::patch('notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua']);
         Route::patch('notifikasi/{id}/baca', [NotifikasiController::class, 'baca']);
+        Route::delete('notifikasi/{id}', [NotifikasiController::class, 'destroy']);
 
         Route::post('device-tokens', [DeviceTokenController::class, 'store']);
         Route::delete('device-tokens', [DeviceTokenController::class, 'destroy']);

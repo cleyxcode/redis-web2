@@ -12,7 +12,7 @@ class PendingPendaftaranAlertWidget extends Widget
 {
     protected static string $view = 'filament.widgets.pending-pendaftaran-alert';
 
-    protected static ?int $sort = 0;
+    protected static ?int $sort = -1;
 
     protected int | string | array $columnSpan = 'full';
 

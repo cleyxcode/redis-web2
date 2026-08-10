@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfilAkunController;
 use App\Http\Controllers\GaleriController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PendaftaranPublikController;
 use App\Http\Controllers\ProfilController;
 use App\Models\Berita;
@@ -76,6 +77,12 @@ Route::middleware('auth')->group(function () {
     // Riwayat Pendaftaran
     Route::get('/pendaftaran/riwayat', [PendaftaranPublikController::class, 'riwayat'])->name('pendaftaran.riwayat');
     Route::get('/pendaftaran/riwayat/{id}', [PendaftaranPublikController::class, 'detail'])->name('pendaftaran.detail');
+
+    // Notifikasi (UI user)
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+    Route::patch('/notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua'])->name('notifikasi.baca-semua');
+    Route::patch('/notifikasi/{id}/baca', [NotifikasiController::class, 'baca'])->name('notifikasi.baca');
+    Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
 
     // Profil Akun
     Route::get('/profil-akun', [ProfilAkunController::class, 'index'])->name('profil-akun');

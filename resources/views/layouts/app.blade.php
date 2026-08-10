@@ -345,6 +345,17 @@ main { animation: pageIn .5s cubic-bezier(.22,1,.36,1) both; }
                             Admin
                         </a>
                     @endif
+                    <a href="{{ route('notifikasi.index') }}"
+                       class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white/80 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 border border-sand dark:border-white/10 text-primary transition-all shadow-sm"
+                       title="Notifikasi"
+                       aria-label="Notifikasi">
+                        <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' {{ ($unreadNotifikasi ?? 0) > 0 ? '1' : '0' }}">notifications</span>
+                        @if(($unreadNotifikasi ?? 0) > 0)
+                            <span class="absolute -top-1 -right-1 min-w-[1.1rem] h-4.5 px-1 rounded-full bg-accent text-primary text-[10px] font-black flex items-center justify-center leading-none">
+                                {{ $unreadNotifikasi > 9 ? '9+' : $unreadNotifikasi }}
+                            </span>
+                        @endif
+                    </a>
                     <div class="relative" id="user-dropdown-wrapper">
                         <button id="user-dropdown-btn"
                                 class="flex items-center gap-2 bg-white/80 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 border border-sand dark:border-white/10 px-3 py-2 rounded-xl transition-all shadow-sm">
@@ -369,6 +380,16 @@ main { animation: pageIn .5s cubic-bezier(.22,1,.36,1) both; }
                                 </div>
                             </div>
                             <div class="p-2">
+                                <a href="{{ route('notifikasi.index') }}"
+                                   class="flex items-center gap-2.5 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-cream dark:hover:bg-white/5 rounded-xl transition-colors">
+                                    <span class="material-symbols-outlined text-base text-secondary">notifications</span>
+                                    Notifikasi
+                                    @if(($unreadNotifikasi ?? 0) > 0)
+                                        <span class="ml-auto min-w-[1.25rem] h-5 px-1.5 rounded-full bg-accent text-primary text-[10px] font-black flex items-center justify-center">
+                                            {{ $unreadNotifikasi > 99 ? '99+' : $unreadNotifikasi }}
+                                        </span>
+                                    @endif
+                                </a>
                                 <a href="{{ route('profil-akun') }}"
                                    class="flex items-center gap-2.5 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-cream dark:hover:bg-white/5 rounded-xl transition-colors">
                                     <span class="material-symbols-outlined text-base text-secondary">manage_accounts</span>
@@ -471,6 +492,16 @@ main { animation: pageIn .5s cubic-bezier(.22,1,.36,1) both; }
                     Panel Admin
                 </a>
             @endif
+            <a href="{{ route('notifikasi.index') }}"
+               class="flex items-center gap-2 w-full px-4 py-2.5 mb-2 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-cream dark:hover:bg-white/5 transition-colors">
+                <span class="material-symbols-outlined text-base text-secondary">notifications</span>
+                Notifikasi
+                @if(($unreadNotifikasi ?? 0) > 0)
+                    <span class="ml-auto min-w-[1.25rem] h-5 px-1.5 rounded-full bg-accent text-primary text-[10px] font-black flex items-center justify-center">
+                        {{ $unreadNotifikasi > 99 ? '99+' : $unreadNotifikasi }}
+                    </span>
+                @endif
+            </a>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit"

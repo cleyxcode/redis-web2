@@ -36,6 +36,8 @@
             </div>
         </div>
 
+        @include('pages.pendaftaran._timeline')
+
         {{-- Content card --}}
         <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
 

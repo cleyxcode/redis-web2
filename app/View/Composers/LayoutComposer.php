@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\View\Composers;
 
+use App\Models\Notifikasi;
 use App\Models\ProfilSekolah;
 use App\Models\Setting;
 use App\Support\MapEmbed;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class LayoutComposer
@@ -27,7 +31,16 @@ class LayoutComposer
             $settings['maps_url'] = $settings->get('maps_url') ?: MapEmbed::googleMapsUrl($lat, $lng);
         }
 
+        $unreadNotifikasi = 0;
+        if (Auth::check()) {
+            $unreadNotifikasi = Notifikasi::query()
+                ->where('user_id', Auth::id())
+                ->where('dibaca', false)
+                ->count();
+        }
+
         $view->with('profil', $profil);
         $view->with('settings', $settings);
+        $view->with('unreadNotifikasi', $unreadNotifikasi);
     }
 }

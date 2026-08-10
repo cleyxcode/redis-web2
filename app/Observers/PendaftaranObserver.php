@@ -4,16 +4,34 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
+use App\Mail\PendaftaranStatusMail;
 use App\Models\Pendaftaran;
+use App\Models\User;
 use App\Services\NotifikasiService;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class PendaftaranObserver
 {
     public function __construct(private NotifikasiService $notifikasi) {}
 
     /**
+     * Konfirmasi in-app saat orang tua baru mengajukan pendaftaran.
+     */
+    public function created(Pendaftaran $pendaftaran): void
+    {
+        $this->notifikasi->notifyUser(
+            (int) $pendaftaran->user_id,
+            'Pendaftaran Diterima Sistem',
+            'Pendaftaran atas nama '.$pendaftaran->nama_anak.' berhasil diajukan dan menunggu verifikasi sekolah.',
+            'pendaftaran',
+            (int) $pendaftaran->id,
+        );
+    }
+
+    /**
      * Saat status pendaftaran berubah menjadi 'diterima' atau 'ditolak',
-     * buat notifikasi in-app + push FCM untuk orang tua.
+     * buat notifikasi in-app + push FCM + email untuk orang tua.
      */
     public function updated(Pendaftaran $pendaftaran): void
     {
@@ -31,12 +49,13 @@ class PendaftaranObserver
             }
 
             $this->notifikasi->notifyUser(
-                $pendaftaran->user_id,
+                (int) $pendaftaran->user_id,
                 'Pendaftaran Diterima',
                 $pesan,
                 'pendaftaran',
-                $pendaftaran->id,
+                (int) $pendaftaran->id,
             );
+            $this->sendStatusEmail($pendaftaran);
         }
 
         if ($status === 'ditolak') {
@@ -46,12 +65,30 @@ class PendaftaranObserver
             }
 
             $this->notifikasi->notifyUser(
-                $pendaftaran->user_id,
+                (int) $pendaftaran->user_id,
                 'Pendaftaran Ditolak',
                 $pesan,
                 'pendaftaran',
-                $pendaftaran->id,
+                (int) $pendaftaran->id,
             );
+            $this->sendStatusEmail($pendaftaran);
+        }
+    }
+
+    private function sendStatusEmail(Pendaftaran $pendaftaran): void
+    {
+        try {
+            $user = $pendaftaran->relationLoaded('user')
+                ? $pendaftaran->user
+                : User::query()->find($pendaftaran->user_id);
+
+            if ($user === null || blank($user->email)) {
+                return;
+            }
+
+            Mail::to($user->email)->send(new PendaftaranStatusMail($pendaftaran));
+        } catch (Throwable $e) {
+            report($e);
         }
     }
 }
