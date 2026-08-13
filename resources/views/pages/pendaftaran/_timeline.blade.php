@@ -1,20 +1,28 @@
 {{-- Timeline status pendaftaran --}}
 @php
+    $isPerbaikan = $item->status === 'perlu_perbaikan';
     $steps = [
         [
             'key' => 'diajukan',
             'label' => 'Diajukan',
-            'desc' => $item->created_at?->translatedFormat('d M Y, H:i') ?? '-',
+            'desc' => ($item->nomor_registrasi ? $item->nomor_registrasi.' · ' : '')
+                .($item->created_at?->translatedFormat('d M Y, H:i') ?? '-'),
             'done' => true,
         ],
         [
             'key' => 'verifikasi',
-            'label' => 'Verifikasi',
-            'desc' => $item->status === 'pending'
-                ? 'Sedang diproses sekolah'
-                : ($item->verified_at?->translatedFormat('d M Y, H:i') ?? 'Selesai diverifikasi'),
-            'done' => in_array($item->status, ['diterima', 'ditolak'], true) || filled($item->verified_at),
-            'active' => $item->status === 'pending',
+            'label' => $isPerbaikan ? 'Perlu Perbaikan' : 'Verifikasi',
+            'desc' => match ($item->status) {
+                'pending' => 'Sedang diproses sekolah',
+                'perlu_perbaikan' => filled($item->catatan_verifikasi)
+                    ? (string) $item->catatan_verifikasi
+                    : 'Unggah ulang dokumen yang diminta',
+                default => $item->verified_at?->translatedFormat('d M Y, H:i') ?? 'Selesai diverifikasi',
+            },
+            'done' => in_array($item->status, ['diterima', 'ditolak'], true)
+                || (filled($item->verified_at) && ! $isPerbaikan),
+            'active' => in_array($item->status, ['pending', 'perlu_perbaikan'], true),
+            'danger' => $isPerbaikan,
         ],
         [
             'key' => 'hasil',
@@ -24,8 +32,12 @@
                 default => 'Hasil',
             },
             'desc' => match ($item->status) {
-                'diterima' => 'Selamat, pendaftaran diterima',
-                'ditolak' => 'Pendaftaran tidak diterima',
+                'diterima' => filled($item->catatan_verifikasi)
+                    ? (string) $item->catatan_verifikasi
+                    : 'Selamat, pendaftaran diterima',
+                'ditolak' => filled($item->catatan_verifikasi)
+                    ? (string) $item->catatan_verifikasi
+                    : 'Pendaftaran tidak diterima',
                 default => 'Menunggu pengumuman',
             },
             'done' => in_array($item->status, ['diterima', 'ditolak'], true),

@@ -20,18 +20,21 @@ class PendaftaranObserver
      */
     public function created(Pendaftaran $pendaftaran): void
     {
+        $nomor = $pendaftaran->nomor_registrasi
+            ? ' (No. '.$pendaftaran->nomor_registrasi.')'
+            : '';
+
         $this->notifikasi->notifyUser(
             (int) $pendaftaran->user_id,
             'Pendaftaran Diterima Sistem',
-            'Pendaftaran atas nama '.$pendaftaran->nama_anak.' berhasil diajukan dan menunggu verifikasi sekolah.',
+            'Pendaftaran atas nama '.$pendaftaran->nama_anak.$nomor.' berhasil diajukan dan menunggu verifikasi sekolah.',
             'pendaftaran',
             (int) $pendaftaran->id,
         );
     }
 
     /**
-     * Saat status pendaftaran berubah menjadi 'diterima' atau 'ditolak',
-     * buat notifikasi in-app + push FCM + email untuk orang tua.
+     * Saat status berubah: notifikasi in-app + push FCM + email (kecuali re-submit ke pending).
      */
     public function updated(Pendaftaran $pendaftaran): void
     {
@@ -56,6 +59,8 @@ class PendaftaranObserver
                 (int) $pendaftaran->id,
             );
             $this->sendStatusEmail($pendaftaran);
+
+            return;
         }
 
         if ($status === 'ditolak') {
@@ -72,6 +77,38 @@ class PendaftaranObserver
                 (int) $pendaftaran->id,
             );
             $this->sendStatusEmail($pendaftaran);
+
+            return;
+        }
+
+        if ($status === 'perlu_perbaikan') {
+            $pesan = 'Pendaftaran atas nama '.$pendaftaran->nama_anak.' perlu diperbaiki.';
+            if ($catatan !== '') {
+                $pesan .= ' Catatan: '.$catatan;
+            } else {
+                $pesan .= ' Silakan unggah ulang dokumen yang diminta.';
+            }
+
+            $this->notifikasi->notifyUser(
+                (int) $pendaftaran->user_id,
+                'Perlu Perbaikan Dokumen',
+                $pesan,
+                'pendaftaran',
+                (int) $pendaftaran->id,
+            );
+            $this->sendStatusEmail($pendaftaran);
+
+            return;
+        }
+
+        if ($status === 'pending' && $pendaftaran->getOriginal('status') === 'perlu_perbaikan') {
+            $this->notifikasi->notifyUser(
+                (int) $pendaftaran->user_id,
+                'Dokumen Dikirim Ulang',
+                'Dokumen untuk '.$pendaftaran->nama_anak.' telah dikirim ulang dan menunggu verifikasi ulang.',
+                'pendaftaran',
+                (int) $pendaftaran->id,
+            );
         }
     }
 
@@ -86,7 +123,7 @@ class PendaftaranObserver
                 return;
             }
 
-            Mail::to($user->email)->send(new PendaftaranStatusMail($pendaftaran));
+            Mail::to($user->email)->queue(new PendaftaranStatusMail($pendaftaran));
         } catch (Throwable $e) {
             report($e);
         }

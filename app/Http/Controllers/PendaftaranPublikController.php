@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\PendaftaranException;
 use App\Models\InfoPendaftaran;
 use App\Models\Pendaftaran;
 use App\Services\PendaftaranService;
+use App\Support\WhatsApp;
 use Illuminate\Http\Request;
 
 class PendaftaranPublikController extends Controller
@@ -23,7 +25,7 @@ class PendaftaranPublikController extends Controller
 
     public function store(Request $request)
     {
-        $infoPendaftaran = InfoPendaftaran::where('status', 'aktif')->firstOrFail();
+        InfoPendaftaran::where('status', 'aktif')->firstOrFail();
 
         $validated = $request->validate(array_merge([
             'nama_anak' => 'required|string|max:255',
@@ -53,19 +55,32 @@ class PendaftaranPublikController extends Controller
             'dokumen_akta.required' => 'Dokumen Akta Kelahiran wajib diunggah.',
         ]);
 
-        $this->service->submit(
-            $request->user(),
-            $validated,
-            [
-                'kk' => $request->file('dokumen_kk'),
-                'akta' => $request->file('dokumen_akta'),
-                'pas_foto' => $request->file('dokumen_pas_foto'),
-            ]
+        try {
+            $pendaftaran = $this->service->submit(
+                $request->user(),
+                $validated,
+                [
+                    'kk' => $request->file('dokumen_kk'),
+                    'akta' => $request->file('dokumen_akta'),
+                    'pas_foto' => $request->file('dokumen_pas_foto'),
+                ]
+            );
+        } catch (PendaftaranException $e) {
+            return back()->withInput()->withErrors(['pendaftaran' => $e->getMessage()]);
+        }
+
+        $wa = WhatsApp::url(
+            WhatsApp::schoolContact(),
+            'Halo, saya sudah mendaftar PPDB. No. registrasi: '.($pendaftaran->nomor_registrasi ?? $pendaftaran->id)
+                .' atas nama '.$pendaftaran->nama_anak.'.'
         );
 
         return redirect()->route('pendaftaran.sukses')
             ->with('nama_anak', $validated['nama_anak'])
-            ->with('no_hp', $validated['no_hp']);
+            ->with('no_hp', $validated['no_hp'])
+            ->with('nomor_registrasi', $pendaftaran->nomor_registrasi)
+            ->with('pendaftaran_id', $pendaftaran->id)
+            ->with('whatsapp_sekolah', $wa);
     }
 
     public function sukses()
@@ -89,6 +104,46 @@ class PendaftaranPublikController extends Controller
             ->with('infoPendaftaran')
             ->findOrFail($id);
 
-        return view('pages.pendaftaran.detail', compact('item'));
+        $whatsappSekolah = WhatsApp::url(
+            WhatsApp::schoolContact(),
+            'Halo, saya ingin menanyakan status PPDB'
+                .($item->nomor_registrasi ? ' No. '.$item->nomor_registrasi : '')
+                .' atas nama '.$item->nama_anak.'.'
+        );
+
+        return view('pages.pendaftaran.detail', compact('item', 'whatsappSekolah'));
+    }
+
+    public function resubmitDokumen(Request $request, int $id)
+    {
+        $request->validate(PendaftaranService::dokumenRules(required: false), [
+            'dokumen_kk.max' => 'Ukuran dokumen KK maksimal 5MB.',
+            'dokumen_akta.max' => 'Ukuran dokumen Akta maksimal 5MB.',
+        ]);
+
+        try {
+            $this->service->resubmitDokumen(
+                $request->user(),
+                $id,
+                [
+                    'kk' => $request->file('dokumen_kk'),
+                    'akta' => $request->file('dokumen_akta'),
+                    'pas_foto' => $request->file('dokumen_pas_foto'),
+                ]
+            );
+        } catch (PendaftaranException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Dokumen berhasil dikirim ulang. Menunggu verifikasi ulang.');
+    }
+
+    public function buktiPdf(int $id)
+    {
+        try {
+            return $this->service->buktiPdf(auth()->user(), $id);
+        } catch (PendaftaranException $e) {
+            abort(404, $e->getMessage());
+        }
     }
 }

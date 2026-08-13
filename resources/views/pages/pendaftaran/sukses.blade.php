@@ -64,6 +64,11 @@
                     Data atas nama <strong class="text-primary dark:text-accent font-black">{{ session('nama_anak') }}</strong> telah kami terima.
                 </p>
             @endif
+            @if(session('nomor_registrasi'))
+                <p class="text-sm font-mono font-bold text-secondary mb-3">
+                    No. Registrasi: {{ session('nomor_registrasi') }}
+                </p>
+            @endif
             <p class="text-slate-400 text-sm leading-relaxed mb-8 max-w-sm mx-auto">
                 Tim kami akan memverifikasi data dan menghubungi Anda melalui nomor HP yang terdaftar dalam <strong class="text-slate-600 dark:text-slate-300">1–3 hari kerja</strong>.
             </p>
@@ -98,6 +103,20 @@
 
         {{-- Actions --}}
         <div class="slide-up flex flex-col sm:flex-row gap-3 justify-center" style="animation-delay:.75s">
+            @if(session('whatsapp_sekolah'))
+                <a href="{{ session('whatsapp_sekolah') }}" target="_blank" rel="noopener"
+                   class="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-600/25 hover:scale-105 active:scale-95">
+                    <span class="material-symbols-outlined text-base">chat</span>
+                    Hubungi Sekolah (WA)
+                </a>
+            @endif
+            @if(session('pendaftaran_id'))
+                <a href="{{ route('pendaftaran.bukti-pdf', session('pendaftaran_id')) }}"
+                   class="flex items-center justify-center gap-2 bg-white dark:bg-slate-800 border border-sand dark:border-slate-700 text-slate-700 dark:text-slate-300 px-8 py-3.5 rounded-xl font-bold text-sm hover:border-secondary/40 hover:text-secondary transition-all">
+                    <span class="material-symbols-outlined text-base">picture_as_pdf</span>
+                    Unduh Bukti
+                </a>
+            @endif
             <a href="{{ route('pendaftaran.riwayat') }}"
                class="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/25 hover:scale-105 active:scale-95">
                 <span class="material-symbols-outlined text-base">assignment</span>

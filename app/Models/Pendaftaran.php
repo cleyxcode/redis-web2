@@ -20,6 +20,7 @@ class Pendaftaran extends Model
     protected $fillable = [
         'user_id',
         'info_pendaftaran_id',
+        'nomor_registrasi',
         'nama_anak',
         'tempat_lahir',
         'tanggal_lahir',
@@ -83,6 +84,11 @@ class Pendaftaran extends Model
     public function verifier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function siswa(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Siswa::class);
     }
 
     public function getDokumenLengkapAttribute(): bool

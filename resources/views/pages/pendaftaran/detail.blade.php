@@ -17,6 +17,7 @@
             $statusConfig = match($item->status) {
                 'diterima' => ['bg'=>'bg-green-500', 'light'=>'bg-green-50 dark:bg-green-900/20', 'border'=>'border-green-200 dark:border-green-800', 'text'=>'text-green-700 dark:text-green-300', 'icon'=>'check_circle', 'label'=>'DITERIMA'],
                 'ditolak'  => ['bg'=>'bg-red-500',   'light'=>'bg-red-50 dark:bg-red-900/20',     'border'=>'border-red-200 dark:border-red-800',     'text'=>'text-red-700 dark:text-red-300',     'icon'=>'cancel',       'label'=>'DITOLAK'],
+                'perlu_perbaikan' => ['bg'=>'bg-sky-500', 'light'=>'bg-sky-50 dark:bg-sky-900/20', 'border'=>'border-sky-200 dark:border-sky-800', 'text'=>'text-sky-700 dark:text-sky-300', 'icon'=>'upload_file', 'label'=>'PERLU PERBAIKAN'],
                 default    => ['bg'=>'bg-amber-400',  'light'=>'bg-amber-50 dark:bg-amber-900/20', 'border'=>'border-amber-200 dark:border-amber-800', 'text'=>'text-amber-700 dark:text-amber-300', 'icon'=>'schedule',     'label'=>'MENUNGGU VERIFIKASI'],
             };
         @endphp
@@ -26,9 +27,12 @@
             <div class="{{ $statusConfig['bg'] }} w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg">
                 <span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings:'FILL' 1">{{ $statusConfig['icon'] }}</span>
             </div>
-            <div>
+            <div class="min-w-0">
                 <p class="text-xs font-semibold {{ $statusConfig['text'] }} opacity-70 uppercase tracking-widest">Status Pendaftaran</p>
                 <p class="text-lg font-black {{ $statusConfig['text'] }}">{{ $statusConfig['label'] }}</p>
+                @if($item->nomor_registrasi)
+                    <p class="text-xs text-slate-500 mt-1 font-mono">{{ $item->nomor_registrasi }}</p>
+                @endif
             </div>
             <div class="ml-auto text-right hidden sm:block">
                 <p class="text-xs text-slate-400">Tahun Ajaran</p>
@@ -36,7 +40,65 @@
             </div>
         </div>
 
+        <div class="flex flex-wrap gap-2 mb-6">
+            <a href="{{ route('pendaftaran.bukti-pdf', $item->id) }}"
+               class="inline-flex items-center gap-2 bg-white dark:bg-slate-800 border border-sand dark:border-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:border-primary/40 transition-colors">
+                <span class="material-symbols-outlined text-base text-primary">picture_as_pdf</span>
+                Unduh Bukti PDF
+            </a>
+            @if(!empty($whatsappSekolah))
+                <a href="{{ $whatsappSekolah }}" target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-colors">
+                    <span class="material-symbols-outlined text-base">chat</span>
+                    Hubungi Sekolah (WA)
+                </a>
+            @endif
+        </div>
+
+        @if(session('success'))
+            <div class="mb-4 bg-green-50 border border-green-200 text-green-700 rounded-xl p-4 text-sm font-medium">{{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm font-medium">{{ session('error') }}</div>
+        @endif
+
         @include('pages.pendaftaran._timeline')
+
+        @if($item->status === 'perlu_perbaikan')
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-sky-200 dark:border-sky-800 shadow-sm p-5 mb-6">
+            <h3 class="text-sm font-black text-slate-800 dark:text-white mb-1">Unggah Ulang Dokumen</h3>
+            <p class="text-xs text-slate-500 mb-4">
+                @if($item->catatan_verifikasi)
+                    Catatan sekolah: {{ $item->catatan_verifikasi }}
+                @else
+                    Unggah dokumen yang diminta, lalu kirim ulang.
+                @endif
+            </p>
+            <form action="{{ route('pendaftaran.resubmit-dokumen', $item->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                <div class="grid sm:grid-cols-3 gap-3">
+                    <label class="block text-xs font-bold text-slate-500">
+                        Kartu Keluarga
+                        <input type="file" name="dokumen_kk" accept=".pdf,.jpg,.jpeg,.png" class="mt-1 block w-full text-sm">
+                    </label>
+                    <label class="block text-xs font-bold text-slate-500">
+                        Akta Kelahiran
+                        <input type="file" name="dokumen_akta" accept=".pdf,.jpg,.jpeg,.png" class="mt-1 block w-full text-sm">
+                    </label>
+                    <label class="block text-xs font-bold text-slate-500">
+                        Pas Foto
+                        <input type="file" name="dokumen_pas_foto" accept=".jpg,.jpeg,.png" class="mt-1 block w-full text-sm">
+                    </label>
+                </div>
+                @error('pendaftaran')
+                    <p class="text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-bold">
+                    Kirim Ulang Dokumen
+                </button>
+            </form>
+        </div>
+        @endif
 
         {{-- Content card --}}
         <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
@@ -154,6 +216,14 @@
             <span class="material-symbols-outlined text-blue-500 text-base shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1">info</span>
             <p class="text-sm text-blue-700 dark:text-blue-300">
                 Pendaftaran Anda sedang dalam proses verifikasi oleh pihak sekolah. Silakan tunggu pengumuman selanjutnya.
+            </p>
+        </div>
+        @elseif($item->status === 'perlu_perbaikan')
+        <div class="mt-4 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-xl p-4 flex items-start gap-3">
+            <span class="material-symbols-outlined text-sky-500 text-base shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1">upload_file</span>
+            <p class="text-sm text-sky-700 dark:text-sky-300">
+                Sekolah meminta perbaikan dokumen.
+                @if($item->catatan_verifikasi) Catatan: {{ $item->catatan_verifikasi }} @endif
             </p>
         </div>
         @elseif($item->status === 'diterima')

@@ -77,6 +77,8 @@ Route::middleware('auth')->group(function () {
     // Riwayat Pendaftaran
     Route::get('/pendaftaran/riwayat', [PendaftaranPublikController::class, 'riwayat'])->name('pendaftaran.riwayat');
     Route::get('/pendaftaran/riwayat/{id}', [PendaftaranPublikController::class, 'detail'])->name('pendaftaran.detail');
+    Route::post('/pendaftaran/riwayat/{id}/dokumen', [PendaftaranPublikController::class, 'resubmitDokumen'])->name('pendaftaran.resubmit-dokumen');
+    Route::get('/pendaftaran/riwayat/{id}/bukti-pdf', [PendaftaranPublikController::class, 'buktiPdf'])->name('pendaftaran.bukti-pdf');
 
     // Notifikasi (UI user)
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');

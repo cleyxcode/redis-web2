@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\PendaftaranException;
 use App\Http\Controllers\Controller;
 use App\Services\PendaftaranService;
+use App\Support\WhatsApp;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PendaftaranController extends Controller
 {
@@ -21,8 +24,14 @@ class PendaftaranController extends Controller
             return response()->json(['message' => 'Pendaftaran sedang tidak dibuka.'], 404);
         }
 
+        $schoolWa = WhatsApp::url(
+            WhatsApp::schoolContact(),
+            'Halo, saya ingin bertanya tentang PPDB SD Negeri Warialau.'
+        );
+
         return response()->json(array_merge($info->toArray(), [
             'syarat_list' => $info->syarat_list,
+            'whatsapp_sekolah' => $schoolWa,
         ]));
     }
 
@@ -57,24 +66,31 @@ class PendaftaranController extends Controller
             'dokumen_pas_foto.max' => 'Ukuran pas foto maksimal 5MB.',
         ]);
 
-        $pendaftaran = $this->service->submit(
-            $request->user(),
-            $data,
-            [
-                'kk' => $request->file('dokumen_kk'),
-                'akta' => $request->file('dokumen_akta'),
-                'pas_foto' => $request->file('dokumen_pas_foto'),
-                'legacy' => $request->file('dokumen'),
-            ]
-        );
-
-        if (! $pendaftaran) {
-            return response()->json(['message' => 'Pendaftaran sedang tidak dibuka.'], 422);
+        try {
+            $pendaftaran = $this->service->submit(
+                $request->user(),
+                $data,
+                [
+                    'kk' => $request->file('dokumen_kk'),
+                    'akta' => $request->file('dokumen_akta'),
+                    'pas_foto' => $request->file('dokumen_pas_foto'),
+                    'legacy' => $request->file('dokumen'),
+                ]
+            );
+        } catch (PendaftaranException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
+
+        $schoolWa = WhatsApp::url(
+            WhatsApp::schoolContact(),
+            'Halo, saya sudah mendaftar PPDB. No. registrasi: '.($pendaftaran->nomor_registrasi ?? $pendaftaran->id)
+                .' atas nama '.$pendaftaran->nama_anak.'.'
+        );
 
         return response()->json([
             'message' => 'Pendaftaran berhasil diajukan.',
             'pendaftaran' => $pendaftaran,
+            'whatsapp_sekolah' => $schoolWa,
         ], 201);
     }
 
@@ -94,5 +110,44 @@ class PendaftaranController extends Controller
         }
 
         return response()->json($item);
+    }
+
+    public function resubmitDokumen(Request $request, int $id): JsonResponse
+    {
+        $request->validate(PendaftaranService::dokumenRules(required: false), [
+            'dokumen_kk.max' => 'Ukuran dokumen KK maksimal 5MB.',
+            'dokumen_akta.max' => 'Ukuran dokumen Akta maksimal 5MB.',
+            'dokumen_pas_foto.max' => 'Ukuran pas foto maksimal 5MB.',
+        ]);
+
+        try {
+            $pendaftaran = $this->service->resubmitDokumen(
+                $request->user(),
+                $id,
+                [
+                    'kk' => $request->file('dokumen_kk'),
+                    'akta' => $request->file('dokumen_akta'),
+                    'pas_foto' => $request->file('dokumen_pas_foto'),
+                ]
+            );
+        } catch (PendaftaranException $e) {
+            $code = $e->getMessage() === PendaftaranException::notFound()->getMessage() ? 404 : 422;
+
+            return response()->json(['message' => $e->getMessage()], $code);
+        }
+
+        return response()->json([
+            'message' => 'Dokumen berhasil dikirim ulang.',
+            'pendaftaran' => $pendaftaran,
+        ]);
+    }
+
+    public function buktiPdf(Request $request, int $id): StreamedResponse|JsonResponse
+    {
+        try {
+            return $this->service->buktiPdf($request->user(), $id);
+        } catch (PendaftaranException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 }

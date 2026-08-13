@@ -84,23 +84,27 @@ class FeatureServicesTest extends TestCase
 
         $this->assertNotNull($pendaftaran);
         $this->assertSame('pending', $pendaftaran->status);
+        $this->assertNotEmpty($pendaftaran->nomor_registrasi);
         $this->assertCount(1, $service->getRiwayat($user));
         $this->assertSame($pendaftaran->id, $service->getDetail($user, $pendaftaran->id)->id);
     }
 
-    public function test_pendaftaran_submit_returns_null_when_closed(): void
+    public function test_pendaftaran_submit_throws_when_closed(): void
     {
         $user = $this->createUser();
         $service = app(PendaftaranService::class);
 
-        $this->assertNull($service->submit($user, [
+        $this->expectException(\App\Exceptions\PendaftaranException::class);
+        $this->expectExceptionMessage('Pendaftaran sedang tidak dibuka.');
+
+        $service->submit($user, [
             'nama_anak' => 'Anak',
             'tanggal_lahir' => '2019-01-01',
             'jenis_kelamin' => 'L',
             'agama' => 'Kristen',
             'alamat' => 'Alamat',
             'no_hp' => '0812',
-        ]));
+        ]);
     }
 
     public function test_profile_service_updates_info_and_password(): void

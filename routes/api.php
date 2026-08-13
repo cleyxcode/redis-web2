@@ -63,6 +63,9 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
             ->middleware('throttle:pendaftaran');
         Route::get('pendaftaran/riwayat', [PendaftaranController::class, 'riwayat']);
         Route::get('pendaftaran/{id}', [PendaftaranController::class, 'show']);
+        Route::post('pendaftaran/{id}/dokumen', [PendaftaranController::class, 'resubmitDokumen'])
+            ->middleware('throttle:pendaftaran');
+        Route::get('pendaftaran/{id}/bukti-pdf', [PendaftaranController::class, 'buktiPdf']);
 
         Route::get('notifikasi', [NotifikasiController::class, 'index']);
         Route::get('notifikasi/unread-count', [NotifikasiController::class, 'unreadCount']);

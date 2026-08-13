@@ -35,8 +35,13 @@ class SystemStatusCommand extends Command
 
         $fcmOk = $fcm->isConfigured();
         $this->line('FCM configured: '.($fcmOk ? 'yes' : 'NO (set FCM_PROJECT_ID + FCM_CREDENTIALS)'));
-        $this->line('Device tokens : '.DeviceToken::query()->count());
-        $this->line('Orangtua users: '.User::query()->where('role', 'orangtua')->count());
+
+        try {
+            $this->line('Device tokens : '.DeviceToken::query()->count());
+            $this->line('Orangtua users: '.User::query()->where('role', 'orangtua')->count());
+        } catch (Throwable $e) {
+            $this->warn('DB counts    : '.$e->getMessage());
+        }
 
         $sentry = (string) config('sentry.dsn');
         $this->line('Sentry DSN    : '.($sentry !== '' ? 'set' : 'empty'));

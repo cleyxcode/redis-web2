@@ -73,4 +73,24 @@ class NotifikasiApiTest extends TestCase
             ->assertJsonPath('total', 1)
             ->assertJsonPath('data.0.judul', 'Trailing');
     }
+
+    public function test_user_can_delete_own_notifikasi(): void
+    {
+        $user = $this->createUser();
+        $other = $this->createUser();
+        $own = $this->createNotifikasi($user, ['judul' => 'Milik Saya']);
+        $foreign = $this->createNotifikasi($other, ['judul' => 'Milik Orang']);
+        Sanctum::actingAs($user);
+
+        $this->deleteJson('/api/v1/notifikasi/'.$own->id)
+            ->assertOk()
+            ->assertJsonPath('message', 'Notifikasi dihapus.');
+
+        $this->assertDatabaseMissing('notifikasi', ['id' => $own->id]);
+
+        $this->deleteJson('/api/v1/notifikasi/'.$foreign->id)
+            ->assertNotFound();
+
+        $this->assertDatabaseHas('notifikasi', ['id' => $foreign->id]);
+    }
 }

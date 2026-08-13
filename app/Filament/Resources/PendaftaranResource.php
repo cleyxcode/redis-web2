@@ -67,6 +67,7 @@ class PendaftaranResource extends Resource
                         Forms\Components\Select::make('status')
                             ->options([
                                 'pending' => 'Pending',
+                                'perlu_perbaikan' => 'Perlu Perbaikan',
                                 'diterima' => 'Diterima',
                                 'ditolak' => 'Ditolak',
                             ])
@@ -143,10 +144,15 @@ class PendaftaranResource extends Resource
 
                 Infolists\Components\Section::make('Status Pendaftaran')
                     ->schema([
+                        Infolists\Components\TextEntry::make('nomor_registrasi')
+                            ->label('No. Registrasi')
+                            ->placeholder('—')
+                            ->copyable(),
                         Infolists\Components\TextEntry::make('status')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'pending' => 'warning',
+                                'perlu_perbaikan' => 'info',
                                 'diterima' => 'success',
                                 'ditolak' => 'danger',
                                 default => 'gray',
@@ -162,6 +168,10 @@ class PendaftaranResource extends Resource
                             ->label('Waktu verifikasi')
                             ->dateTime()
                             ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('siswa.nama')
+                            ->label('Data siswa')
+                            ->placeholder('Belum dibuat')
+                            ->visible(fn (Pendaftaran $record): bool => $record->status === 'diterima'),
                     ])->columns(3),
             ]);
     }
@@ -170,6 +180,10 @@ class PendaftaranResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('nomor_registrasi')
+                    ->label('No. Reg')
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('nama_anak')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('nama_ayah')->searchable()->toggleable(),
                 Tables\Columns\TextColumn::make('no_hp')->searchable(),
@@ -180,6 +194,7 @@ class PendaftaranResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
+                        'perlu_perbaikan' => 'info',
                         'diterima' => 'success',
                         'ditolak' => 'danger',
                         default => 'gray',
@@ -192,6 +207,7 @@ class PendaftaranResource extends Resource
                 SelectFilter::make('status')
                     ->options([
                         'pending' => 'Pending',
+                        'perlu_perbaikan' => 'Perlu Perbaikan',
                         'diterima' => 'Diterima',
                         'ditolak' => 'Ditolak',
                     ]),

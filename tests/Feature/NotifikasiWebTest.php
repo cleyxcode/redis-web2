@@ -62,4 +62,16 @@ class NotifikasiWebTest extends TestCase
             ->assertSee('Belum')
             ->assertDontSee('Sudah');
     }
+
+    public function test_user_can_delete_notifikasi(): void
+    {
+        $user = $this->createUser();
+        $n = $this->createNotifikasi($user, ['judul' => 'Hapus Saya']);
+
+        $this->actingAs($user)
+            ->delete('/notifikasi/'.$n->id)
+            ->assertRedirect();
+
+        $this->assertDatabaseMissing('notifikasi', ['id' => $n->id]);
+    }
 }

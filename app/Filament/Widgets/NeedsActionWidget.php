@@ -7,6 +7,7 @@ namespace App\Filament\Widgets;
 use App\Filament\Resources\BeritaResource;
 use App\Filament\Resources\PendaftaranResource;
 use App\Models\Berita;
+use App\Models\Notifikasi;
 use App\Models\Pendaftaran;
 use App\Services\FcmPushService;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -24,6 +25,7 @@ class NeedsActionWidget extends BaseWidget
     {
         $pending = Pendaftaran::query()->where('status', 'pending')->count();
         $draftBerita = Berita::query()->where('status', 'draft')->count();
+        $unread = Notifikasi::query()->where('dibaca', false)->count();
 
         $failedJobs = 0;
         $pendingJobs = 0;
@@ -35,6 +37,12 @@ class NeedsActionWidget extends BaseWidget
         }
 
         $fcmOk = app(FcmPushService::class)->isConfigured();
+        $queueDesc = $failedJobs > 0
+            ? "{$failedJobs} gagal — cek queue worker"
+            : ($pendingJobs > 0 ? 'Push/email menunggu worker' : 'Antrian kosong');
+        if (! $fcmOk) {
+            $queueDesc .= ' · FCM belum diset';
+        }
 
         return [
             Stat::make('Perlu Verifikasi', $pending)
@@ -43,6 +51,11 @@ class NeedsActionWidget extends BaseWidget
                 ->color($pending > 0 ? 'warning' : 'success')
                 ->url(PendaftaranResource::getUrl('index')),
 
+            Stat::make('Belum Dibaca', $unread)
+                ->description('Notifikasi orang tua belum dibuka')
+                ->icon('heroicon-o-bell-alert')
+                ->color($unread > 0 ? 'info' : 'success'),
+
             Stat::make('Berita Draft', $draftBerita)
                 ->description('Belum dipublish')
                 ->icon('heroicon-o-pencil-square')
@@ -50,14 +63,9 @@ class NeedsActionWidget extends BaseWidget
                 ->url(BeritaResource::getUrl('index')),
 
             Stat::make('Antrian Job', $pendingJobs)
-                ->description($failedJobs > 0 ? "{$failedJobs} gagal — cek queue" : 'Push/email menunggu worker')
+                ->description($queueDesc)
                 ->icon('heroicon-o-queue-list')
-                ->color($failedJobs > 0 ? 'danger' : ($pendingJobs > 0 ? 'warning' : 'success')),
-
-            Stat::make('Push FCM', $fcmOk ? 'Siap' : 'Belum set')
-                ->description($fcmOk ? 'Credentials terdeteksi' : 'Isi FCM_PROJECT_ID & FCM_CREDENTIALS')
-                ->icon('heroicon-o-bell-alert')
-                ->color($fcmOk ? 'success' : 'danger'),
+                ->color($failedJobs > 0 || ! $fcmOk ? 'danger' : ($pendingJobs > 0 ? 'warning' : 'success')),
         ];
     }
 }

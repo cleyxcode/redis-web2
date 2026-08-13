@@ -25,6 +25,7 @@ class PendaftaranStatusMail extends Mailable implements ShouldQueue
         $subject = match ($status) {
             'diterima' => 'Pendaftaran Diterima — '.$this->pendaftaran->nama_anak,
             'ditolak' => 'Pendaftaran Ditolak — '.$this->pendaftaran->nama_anak,
+            'perlu_perbaikan' => 'Perlu Perbaikan Dokumen — '.$this->pendaftaran->nama_anak,
             default => 'Update Pendaftaran — '.$this->pendaftaran->nama_anak,
         };
 
@@ -40,6 +41,7 @@ class PendaftaranStatusMail extends Mailable implements ShouldQueue
                 'statusLabel' => match ($this->pendaftaran->status) {
                     'diterima' => 'Diterima',
                     'ditolak' => 'Ditolak',
+                    'perlu_perbaikan' => 'Perlu Perbaikan',
                     default => 'Menunggu Verifikasi',
                 },
             ],

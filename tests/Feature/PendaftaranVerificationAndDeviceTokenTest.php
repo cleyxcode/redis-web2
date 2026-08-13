@@ -40,6 +40,11 @@ class PendaftaranVerificationAndDeviceTokenTest extends TestCase
             'judul' => 'Pendaftaran Diterima',
         ]);
 
+        $this->assertDatabaseHas('siswa', [
+            'pendaftaran_id' => $pendaftaran->id,
+            'nama' => $pendaftaran->nama_anak,
+        ]);
+
         $notif = Notifikasi::query()->where('user_id', $parent->id)->latest('id')->first();
         $this->assertStringContainsString('Selamat bergabung', (string) $notif?->pesan);
 
