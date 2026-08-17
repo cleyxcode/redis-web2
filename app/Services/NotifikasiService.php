@@ -76,7 +76,7 @@ class NotifikasiService
     }
 
     /**
-     * Bulk in-app notifications (no per-row FCM — use sendToUser separately if needed).
+     * Bulk in-app notifications with FCM push for each user.
      *
      * @param  Collection<int, int|string>|array<int, int|string>  $userIds
      */
@@ -106,6 +106,17 @@ class NotifikasiService
         ])->all();
 
         Notifikasi::query()->insert($rows);
+
+        $pushData = [
+            'tipe' => $tipe,
+            'referensi_id' => (string) ($referensiId ?? ''),
+            'title' => $judul,
+            'body' => $pesan,
+        ];
+
+        foreach ($ids as $userId) {
+            $this->fcm->sendToUser($userId, $judul, $pesan, $pushData);
+        }
 
         return count($rows);
     }
