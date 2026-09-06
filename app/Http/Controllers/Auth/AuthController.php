@@ -22,6 +22,7 @@ class AuthController extends Controller
             'email'                 => 'required|email|unique:users,email',
             'no_hp'                 => 'required|string|max:20',
             'password'              => 'required|string|min:8|confirmed',
+            'cf-turnstile-response' => 'required',
         ], [
             'name.required'         => 'Nama lengkap wajib diisi.',
             'email.required'        => 'Alamat email wajib diisi.',
@@ -31,7 +32,15 @@ class AuthController extends Controller
             'password.required'     => 'Kata sandi wajib diisi.',
             'password.min'          => 'Kata sandi minimal 8 karakter.',
             'password.confirmed'    => 'Konfirmasi kata sandi tidak cocok.',
+            'cf-turnstile-response.required' => 'Verifikasi captcha wajib diisi.',
         ]);
+
+        $turnstile = new \DerekCodes\TurnstileLaravel\TurnstileLaravel();
+        $response = $turnstile->validate($request->input('cf-turnstile-response'));
+
+        if (!$response['status']) {
+            return back()->withErrors(['cf-turnstile-response' => 'Verifikasi captcha gagal.'])->withInput();
+        }
 
         $user = User::create([
             'name'     => $validated['name'],
@@ -61,11 +70,20 @@ class AuthController extends Controller
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required|string',
+            'cf-turnstile-response' => 'required',
         ], [
             'email.required'    => 'Alamat email wajib diisi.',
             'email.email'       => 'Format email tidak valid.',
             'password.required' => 'Kata sandi wajib diisi.',
+            'cf-turnstile-response.required' => 'Verifikasi captcha wajib diisi.',
         ]);
+
+        $turnstile = new \DerekCodes\TurnstileLaravel\TurnstileLaravel();
+        $response = $turnstile->validate($request->input('cf-turnstile-response'));
+
+        if (!$response['status']) {
+            return back()->withErrors(['cf-turnstile-response' => 'Verifikasi captcha gagal.'])->withInput();
+        }
 
         $credentials = $request->only('email', 'password');
 

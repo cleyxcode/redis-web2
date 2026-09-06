@@ -125,6 +125,9 @@
                     <span class="text-sm text-slate-600 dark:text-slate-400">Ingat saya</span>
                 </label>
 
+                {{-- Turnstile --}}
+                <div class="mt-2 cf-turnstile" data-sitekey="{{ env('TURNSTILE_SITE_KEY') }}"></div>
+
                 {{-- Submit --}}
                 <button type="submit"
                         class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3.5 rounded-lg shadow-lg shadow-primary/20 transition-all mt-2 active:scale-[0.98]">
@@ -169,4 +172,5 @@ document.getElementById('toggle-password')?.addEventListener('click', function (
     }
 });
 </script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 @endpush

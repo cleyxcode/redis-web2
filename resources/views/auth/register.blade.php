@@ -132,6 +132,9 @@
                     </div>
                 </div>
 
+                {{-- Turnstile --}}
+                <div class="mt-2 cf-turnstile" data-sitekey="{{ env('TURNSTILE_SITE_KEY') }}"></div>
+
                 {{-- Submit --}}
                 <button type="submit"
                         class="w-full py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
@@ -157,3 +160,7 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endpush
