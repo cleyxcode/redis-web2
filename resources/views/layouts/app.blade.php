@@ -59,32 +59,29 @@
       }
     }
     </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,0..144,300;1,0..144,700;1,0..144,900&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-    <script id="tailwind-config">
+    <script>
         tailwind.config = {
-            darkMode: "class",
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        "primary":   "#0D2340",
-                        "secondary": "#0B7B8B",
-                        "accent":    "#C9933A",
-                        "cream":     "#FAF8F4",
-                        "sand":      "#F0EBE0",
-                        "background-light": "#FAF8F4",
-                        "background-dark":  "#070F1C",
+                        primary: '#0D2340', secondary: '#0B7B8B', accent: '#C9933A',
+                        cream: '#FAF8F4', sand: '#F0EBE0',
+                        'background-light': '#FAF8F4', 'background-dark': '#070F1C',
                     },
                     fontFamily: {
-                        "display": ['"Fraunces"', "Georgia", "serif"],
-                        "body":    ['"Nunito"', "system-ui", "sans-serif"],
+                        display: ['Fraunces', 'Georgia', 'serif'],
+                        body: ['Nunito', 'system-ui', 'sans-serif'],
                     },
                 },
             },
-        }
+        };
     </script>
 
     <style>

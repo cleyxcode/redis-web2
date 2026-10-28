@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\GaleriController;
 use App\Http\Controllers\Api\GuruController;
 use App\Http\Controllers\Api\HealthController;
+use App\Http\Controllers\Api\LokasiController;
 use App\Http\Controllers\Api\NotifikasiController;
 use App\Http\Controllers\Api\PendaftaranController;
 use App\Http\Controllers\Api\ProfileController;
@@ -27,6 +28,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
 
     // ── Public ──────────────────────────────────────────────────────
     Route::get('profil-sekolah', [ProfilSekolahController::class, 'profil']);
+    Route::get('lokasi', [LokasiController::class, 'index']);
     Route::get('banner', [ProfilSekolahController::class, 'banner']);
     Route::get('faq', [FaqController::class, 'index']);
     Route::get('guru', [GuruController::class, 'index']);

@@ -17,7 +17,8 @@
 <body>
     <h1>Data Pendaftaran PPDB</h1>
     <div class="meta">
-        {{ $school }} &mdash; Diekspor {{ $generatedAt->format('d/m/Y H:i') }} &mdash; Total: {{ $items->count() }} data
+        {{ $school }} &mdash; Status: {{ $statusLabel ?? 'Semua Status' }} &mdash;
+        Diekspor {{ $generatedAt->format('d/m/Y H:i') }} &mdash; Total: {{ $items->count() }} data
     </div>
     <table>
         <thead>

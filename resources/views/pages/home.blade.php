@@ -481,8 +481,8 @@
             @foreach($cats as $cat)
                 <a href="{{ route('berita', ['kategori'=>$cat['lbl']]) }}"
                    class="cat-card reveal group flex flex-col items-center gap-3 {{ $cat['bg'] }} hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-sand dark:hover:border-slate-700 rounded-2xl p-4 shadow-sm cursor-pointer">
-                    <div class="w-12 h-12 bg-gradient-to-br {{ $cat['from'] }} {{ $cat['to'] }} rounded-xl flex items-center justify-center shadow-md transition-all group-hover:scale-115 group-hover:shadow-lg duration-300">
-                        <span class="material-symbols-outlined text-white text-xl" style="font-variation-settings:'FILL' 1">{{ $cat['icon'] }}</span>
+                    <div class="w-12 h-12 bg-white/95 dark:bg-slate-900/95 rounded-xl flex items-center justify-center shadow-md ring-1 ring-black/5 dark:ring-white/10 transition-all group-hover:scale-115 group-hover:shadow-lg duration-300">
+                        <span class="material-symbols-outlined text-primary dark:text-accent text-xl" style="font-variation-settings:'FILL' 1">{{ $cat['icon'] }}</span>
                     </div>
                     <p class="text-[11px] font-bold text-slate-600 dark:text-slate-300 group-hover:text-primary dark:group-hover:text-accent text-center transition-colors leading-tight">{{ $cat['lbl'] }}</p>
                 </a>
@@ -607,7 +607,7 @@
 </section>
 
 {{-- ══════════════════════════════════════════════
-     LOKASI SEKOLAH (dari Pengaturan Admin)
+     LOKASI SEKOLAH (dari Data Lokasi Admin)
 ══════════════════════════════════════════════ --}}
 <section class="py-16 bg-white dark:bg-slate-950" id="lokasi">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
@@ -620,7 +620,7 @@
                 Temukan <span class="text-gradient">Sekolah</span>
             </h2>
             <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 leading-relaxed">
-                {{ $settings['alamat_sekolah'] ?? $profil->alamat ?? 'Lokasi SD Negeri Warialau' }}
+                {{ $lokasi?->alamat ?? $settings['alamat_sekolah'] ?? $profil->alamat ?? 'Lokasi SD Negeri Warialau' }}
             </p>
         </div>
 
@@ -633,7 +633,7 @@
                     <div>
                         <p class="font-display font-black text-sm text-slate-900 dark:text-white mb-1">Alamat</p>
                         <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                            {{ $settings['alamat_sekolah'] ?? $profil->alamat ?? 'Belum diatur di panel admin' }}
+                            {{ $lokasi?->alamat ?? $settings['alamat_sekolah'] ?? $profil->alamat ?? 'Belum diatur di panel admin' }}
                         </p>
                     </div>
                 </div>
@@ -667,7 +667,7 @@
                         <div class="w-full h-full min-h-[320px] flex flex-col items-center justify-center text-center p-8">
                             <span class="material-symbols-outlined text-5xl text-primary/40 mb-3" style="font-variation-settings:'FILL' 1">map</span>
                             <p class="font-display font-black text-slate-600 dark:text-slate-300">Peta belum dikonfigurasi</p>
-                            <p class="text-xs text-slate-400 mt-1">Atur lokasi di Admin → Pengaturan → Lokasi</p>
+                            <p class="text-xs text-slate-400 mt-1">Atur lokasi di Admin → Data Sekolah → Lokasi</p>
                         </div>
                     @endif
                 </div>

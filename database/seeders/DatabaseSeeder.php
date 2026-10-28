@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             BannerSeeder::class,         // 5 banner slider
             InfoPendaftaranSeeder::class,// 2 info pendaftaran (1 aktif)
             PendaftaranSeeder::class,    // 40 data pendaftaran + user orangtua
+            DemoContentSeeder::class,    // Pastikan konten publik minimal 15 data
         ]);
     }
 }

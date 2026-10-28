@@ -20,8 +20,9 @@ class AdminExportService
      */
     public function pendaftaranExcel(?Builder $query = null): StreamedResponse
     {
-        $rows = ($query ?? Pendaftaran::query())->latest()->get();
-        $filename = 'pendaftaran-'.now()->format('Ymd-His').'.xlsx';
+        $builder = $query ?? Pendaftaran::query();
+        $rows = (clone $builder)->latest()->get();
+        $filename = 'pendaftaran-'.$this->statusFilename($rows).'-'.now()->format('Ymd-His').'.xlsx';
 
         return $this->xlsxDownload($filename, $this->pendaftaranHeaders(), $rows, function (Pendaftaran $item): array {
             return [
@@ -53,13 +54,15 @@ class AdminExportService
      */
     public function pendaftaranPdf(?Builder $query = null): StreamedResponse
     {
-        $items = ($query ?? Pendaftaran::query())->latest()->get();
-        $filename = 'pendaftaran-'.now()->format('Ymd-His').'.pdf';
+        $builder = $query ?? Pendaftaran::query();
+        $items = (clone $builder)->latest()->get();
+        $filename = 'pendaftaran-'.$this->statusFilename($items).'-'.now()->format('Ymd-His').'.pdf';
 
         $pdf = Pdf::loadView('exports.pendaftaran-pdf', [
             'items' => $items,
             'generatedAt' => now(),
             'school' => 'SD Negeri Warialau',
+            'statusLabel' => $this->statusLabel($items),
         ])->setPaper('a4', 'landscape');
 
         // StreamedResponse agar Livewire mengenali sebagai file download
@@ -134,6 +137,30 @@ class AdminExportService
     private function siswaHeaders(): array
     {
         return ['ID', 'Nama', 'NIS', 'Kelas', 'JK', 'Tahun Ajaran', 'Status', 'Dibuat'];
+    }
+
+    /** @param Collection<int, Pendaftaran> $items */
+    private function statusFilename(Collection $items): string
+    {
+        $statuses = $items->pluck('status')->filter()->unique()->values();
+
+        return match (true) {
+            $statuses->count() === 1 && $statuses->first() === 'diterima' => 'diterima',
+            $statuses->count() === 1 && $statuses->first() === 'ditolak' => 'tidak-diterima',
+            default => 'semua-status',
+        };
+    }
+
+    /** @param Collection<int, Pendaftaran> $items */
+    private function statusLabel(Collection $items): string
+    {
+        $statuses = $items->pluck('status')->filter()->unique()->values();
+
+        return match (true) {
+            $statuses->count() === 1 && $statuses->first() === 'diterima' => 'Diterima',
+            $statuses->count() === 1 && $statuses->first() === 'ditolak' => 'Tidak Diterima',
+            default => 'Semua Status',
+        };
     }
 
     /**

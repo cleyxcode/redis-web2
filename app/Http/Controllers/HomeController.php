@@ -8,6 +8,7 @@ use App\Models\Faq;
 use App\Models\Galeri;
 use App\Models\Guru;
 use App\Models\InfoPendaftaran;
+use App\Models\Lokasi;
 use App\Models\ProfilSekolah;
 use App\Models\Setting;
 use App\Models\Siswa;
@@ -18,10 +19,11 @@ class HomeController extends Controller
     public function index()
     {
         $profil = ProfilSekolah::query()->first();
+        $lokasi = Lokasi::query()->aktif()->orderBy('urutan')->first();
         $settings = Setting::query()->pluck('value', 'key');
 
-        $lat = MapEmbed::toFloat($settings->get('latitude'));
-        $lng = MapEmbed::toFloat($settings->get('longitude'));
+        $lat = MapEmbed::toFloat($lokasi?->latitude ?? $settings->get('latitude'));
+        $lng = MapEmbed::toFloat($lokasi?->longitude ?? $settings->get('longitude'));
         $mapsEmbed = MapEmbed::resolveEmbed($settings->get('maps_embed'), $lat, $lng);
 
         if ($mapsEmbed) {
@@ -30,7 +32,7 @@ class HomeController extends Controller
         if ($lat !== null && $lng !== null) {
             $settings['latitude'] = number_format($lat, 7, '.', '');
             $settings['longitude'] = number_format($lng, 7, '.', '');
-            $settings['maps_url'] = $settings->get('maps_url') ?: MapEmbed::googleMapsUrl($lat, $lng);
+            $settings['maps_url'] = $lokasi?->maps_url ?: ($settings->get('maps_url') ?: MapEmbed::googleMapsUrl($lat, $lng));
         }
 
         $jumlahGuru = Guru::where('status', 'aktif')->count();
@@ -52,6 +54,7 @@ class HomeController extends Controller
         return view('pages.home', compact(
             'profil',
             'settings',
+            'lokasi',
             'jumlahGuru',
             'jumlahSiswa',
             'beritaTerbaru',

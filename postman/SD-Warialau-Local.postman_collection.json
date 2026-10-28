@@ -1,0 +1,69 @@
+{
+  "info": {
+    "name": "SD Negeri Warialau - API Local",
+    "description": "Pengujian API lokal tanpa login dan dengan login Sanctum. Gunakan environment SD Warialau - Local.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000/api/v1" }
+  ],
+  "item": [
+    {
+      "name": "01 - Publik Tanpa Login",
+      "item": [
+        { "name": "Health", "request": { "method": "GET", "header": [], "url": "{{base_url}}/health" } },
+        { "name": "Profil Sekolah", "request": { "method": "GET", "header": [], "url": "{{base_url}}/profil-sekolah" } },
+        { "name": "Banner", "request": { "method": "GET", "header": [], "url": "{{base_url}}/banner" } },
+        { "name": "FAQ", "request": { "method": "GET", "header": [], "url": "{{base_url}}/faq" } },
+        { "name": "Guru", "request": { "method": "GET", "header": [], "url": "{{base_url}}/guru" } },
+        { "name": "Berita", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/berita?per_page=10&page=1", "host": ["{{base_url}}"], "path": ["berita"], "query": [{ "key": "per_page", "value": "10" }, { "key": "page", "value": "1" }] } } },
+        { "name": "Detail Berita", "request": { "method": "GET", "header": [], "url": "{{base_url}}/berita/{{berita_id}}" } },
+        { "name": "Galeri", "request": { "method": "GET", "header": [], "url": "{{base_url}}/galeri?per_page=12&page=1" } },
+        { "name": "Info Pendaftaran", "request": { "method": "GET", "header": [], "url": "{{base_url}}/info-pendaftaran" } }
+      ]
+    },
+    {
+      "name": "02 - Auth",
+      "item": [
+        {
+          "name": "Login dan Simpan Token",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Login berhasil', function () { pm.expect(pm.response.code).to.be.oneOf([200, 201]); });",
+            "const json = pm.response.json();",
+            "const token = json.token || (json.data && json.data.token);",
+            "pm.expect(token, 'Token Sanctum tidak ditemukan').to.be.a('string').and.not.empty;",
+            "pm.environment.set('token', token);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": "{{base_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{base_url}}/auth/logout" }
+        }
+      ]
+    },
+    {
+      "name": "03 - Protected Dengan Login",
+      "item": [
+        { "name": "Profil User", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{base_url}}/profile" } },
+        { "name": "Riwayat Pendaftaran", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{base_url}}/pendaftaran/riwayat" } },
+        { "name": "Daftar Notifikasi", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{base_url}}/notifikasi" } },
+        { "name": "Jumlah Notifikasi Belum Dibaca", "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{base_url}}/notifikasi/unread-count" } },
+        { "name": "Simpan Device Token", "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\n  \"token\": \"{{device_token}}\",\n  \"platform\": \"linux\",\n  \"device_name\": \"Postman Local\"\n}" }, "url": "{{base_url}}/device-tokens" } },
+        { "name": "Hapus Device Token", "request": { "method": "DELETE", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\n  \"token\": \"{{device_token}}\"\n}" }, "url": "{{base_url}}/device-tokens" } }
+      ]
+    },
+    {
+      "name": "04 - Validasi Auth",
+      "item": [
+        { "name": "Profile Tanpa Token - Harus 401", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Tanpa token ditolak 401', function () { pm.response.to.have.status(401); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{base_url}}/profile" } },
+        { "name": "Login Password Salah - Harus 422 atau 401", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Password salah ditolak', function () { pm.expect(pm.response.code).to.be.oneOf([401, 422]); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"password-salah\"\n}" }, "url": "{{base_url}}/auth/login" } }
+      ]
+    }
+  ]
+}

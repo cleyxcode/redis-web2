@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Setting;
+use App\Models\Lokasi;
 use App\Models\TonggakSejarah;
 use App\Repositories\Contracts\BannerRepositoryInterface;
 use App\Repositories\Contracts\ProfilSekolahRepositoryInterface;
@@ -39,10 +40,11 @@ class ProfilSekolahService
                 ])
                 ->pluck('value', 'key');
 
-            $lat = MapEmbed::toFloat($settings->get('latitude'));
-            $lng = MapEmbed::toFloat($settings->get('longitude'));
+            $lokasi = Lokasi::query()->aktif()->orderBy('urutan')->first();
+            $lat = MapEmbed::toFloat($lokasi?->latitude ?? $settings->get('latitude'));
+            $lng = MapEmbed::toFloat($lokasi?->longitude ?? $settings->get('longitude'));
             $mapsEmbed = MapEmbed::resolveEmbed($settings->get('maps_embed'), $lat, $lng);
-            $mapsUrl = $settings->get('maps_url') ?: MapEmbed::googleMapsUrl($lat, $lng);
+            $mapsUrl = $lokasi?->maps_url ?: ($settings->get('maps_url') ?: MapEmbed::googleMapsUrl($lat, $lng));
 
             $tonggak = TonggakSejarah::query()
                 ->aktif()
@@ -58,7 +60,7 @@ class ProfilSekolahService
                 ->all();
 
             return array_merge($profil->toArray(), [
-                'alamat' => $settings->get('alamat_sekolah') ?: $profil->alamat,
+                'alamat' => $lokasi?->alamat ?: ($settings->get('alamat_sekolah') ?: $profil->alamat),
                 'kontak' => $settings->get('no_telp') ?: $profil->kontak,
                 'email_sekolah' => $settings->get('email_sekolah'),
                 'jam_operasional' => $settings->get('jam_operasional'),

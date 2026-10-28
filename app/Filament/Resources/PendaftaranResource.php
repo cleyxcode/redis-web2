@@ -69,7 +69,7 @@ class PendaftaranResource extends Resource
                                 'pending' => 'Pending',
                                 'perlu_perbaikan' => 'Perlu Perbaikan',
                                 'diterima' => 'Diterima',
-                                'ditolak' => 'Ditolak',
+                                'ditolak' => 'Tidak Diterima',
                             ])
                             ->required(),
                         Forms\Components\Textarea::make('catatan_verifikasi')
@@ -209,7 +209,7 @@ class PendaftaranResource extends Resource
                         'pending' => 'Pending',
                         'perlu_perbaikan' => 'Perlu Perbaikan',
                         'diterima' => 'Diterima',
-                        'ditolak' => 'Ditolak',
+                        'ditolak' => 'Tidak Diterima',
                     ]),
                 SelectFilter::make('dokumen_lengkap')
                     ->label('Kelengkapan dokumen')
